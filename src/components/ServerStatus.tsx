@@ -30,7 +30,7 @@ export const ServerStatus: React.FC = () => {
   useEffect(() => {
     const fetchServerStatus = async () => {
       try {
-        const response = await fetch('http://77.92.145.44:3000/api/status');
+        const response = await fetch('http://localhost:3000/api/status');
         if (!response.ok) {
           throw new Error('Failed to fetch server status');
         }

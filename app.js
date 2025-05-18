@@ -1,6 +1,6 @@
 // Constants
 const API_KEY = 'yfQdaYOk4Dd7dbjnUWkX';
-const API_BASE_URL = 'http://77.92.145.44:3000/api';
+const API_BASE_URL = 'http://localhost:3000/api';
 
 // State
 let downloads = [];
