@@ -1,29 +1,103 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Server, HardDrive, Cpu } from 'lucide-react';
 
-export const ServerStatus: React.FC = () => {
-  // Mock data for demonstration
-  const serverInfo = {
-    ip: '77.92.145.44',
-    status: 'online',
-    diskSpace: {
-      total: '2 TB',
-      used: '850 GB',
-      free: '1.15 TB',
-      percentUsed: 42
-    },
-    cpu: {
-      usage: 18,
-      cores: 8
-    },
-    memory: {
-      total: '32 GB',
-      used: '10.4 GB',
-      free: '21.6 GB',
-      percentUsed: 32
-    },
-    uptime: '15 days, 7 hours'
+interface ServerInfo {
+  ip: string;
+  status: string;
+  diskSpace: {
+    total: string;
+    used: string;
+    free: string;
+    percentUsed: number;
   };
+  cpu: {
+    usage: number;
+    cores: number;
+  };
+  memory: {
+    total: string;
+    used: string;
+    free: string;
+    percentUsed: number;
+  };
+  uptime: string;
+}
+
+export const ServerStatus: React.FC = () => {
+  const [serverInfo, setServerInfo] = useState<ServerInfo | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchServerStatus = async () => {
+      try {
+        const response = await fetch('http://77.92.145.44:3000/api/status');
+        if (!response.ok) {
+          throw new Error('Failed to fetch server status');
+        }
+        const data = await response.json();
+        if (data.status === 'success') {
+          setServerInfo({
+            ip: data.data.ip,
+            status: 'online',
+            diskSpace: {
+              total: data.data.diskSpace.total,
+              used: data.data.diskSpace.used,
+              free: data.data.diskSpace.free,
+              percentUsed: parseInt(data.data.diskSpace.percentUsed)
+            },
+            cpu: {
+              usage: data.data.cpu.usage || 0,
+              cores: data.data.cpu.cores
+            },
+            memory: {
+              total: data.data.memory.total,
+              used: data.data.memory.used,
+              free: data.data.memory.free,
+              percentUsed: parseInt(data.data.memory.percentUsed) || 0
+            },
+            uptime: data.data.uptime
+          });
+          setError(null);
+        }
+      } catch (err) {
+        setError('Failed to connect to server');
+        console.error('Error fetching server status:', err);
+      }
+    };
+
+    fetchServerStatus();
+    const interval = setInterval(fetchServerStatus, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  if (error) {
+    return (
+      <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <Server size={20} className="text-red-500" />
+            <h2 className="ml-2 text-xl font-bold text-white">Server Status</h2>
+          </div>
+          <div className="flex items-center">
+            <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+            <span className="text-sm text-red-400">Offline</span>
+          </div>
+        </div>
+        <p className="text-red-400 text-center">{error}</p>
+      </div>
+    );
+  }
+
+  if (!serverInfo) {
+    return (
+      <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+        <div className="flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
@@ -76,7 +150,7 @@ export const ServerStatus: React.FC = () => {
             </div>
             <div className="flex justify-between mt-1">
               <span className="text-xs text-gray-400">
-                {serverInfo.cpu.usage}% (8 cores)
+                {serverInfo.cpu.usage}% ({serverInfo.cpu.cores} cores)
               </span>
               <span className="text-xs text-gray-400">
                 Idle: {100 - serverInfo.cpu.usage}%
