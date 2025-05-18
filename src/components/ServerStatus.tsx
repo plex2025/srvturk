@@ -30,10 +30,17 @@ export const ServerStatus: React.FC = () => {
   useEffect(() => {
     const fetchServerStatus = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/status');
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+        const response = await fetch(`${API_BASE_URL}/api/status`, {
+          headers: {
+            'Accept': 'application/json',
+          }
+        });
+        
         if (!response.ok) {
           throw new Error('Failed to fetch server status');
         }
+        
         const data = await response.json();
         if (data.status === 'success') {
           setServerInfo({

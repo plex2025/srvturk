@@ -1,6 +1,6 @@
 // Constants
 const API_KEY = 'yfQdaYOk4Dd7dbjnUWkX';
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 // State
 let downloads = [];
@@ -118,10 +118,11 @@ function updateStartButton() {
 async function startDownloads() {
     for (const url of urls) {
         try {
-            const response = await fetch(`${API_BASE_URL}/download`, {
+            const response = await fetch(`${API_BASE_URL}/api/download`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                 },
                 body: JSON.stringify({ url })
             });
@@ -318,7 +319,16 @@ function capitalizeFirst(string) {
 
 async function updateServerStatus() {
     try {
-        const response = await fetch(`${API_BASE_URL}/status`);
+        const response = await fetch(`${API_BASE_URL}/api/status`, {
+            headers: {
+                'Accept': 'application/json',
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch server status');
+        }
+        
         const data = await response.json();
         
         if (data.status === 'success') {
@@ -415,5 +425,22 @@ async function updateServerStatus() {
         }
     } catch (error) {
         console.error('Error updating server status:', error);
+        serverStatus.innerHTML = `
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12" y2="16"/>
+                    </svg>
+                    <h2 class="ml-2 text-xl font-bold">Server Status</h2>
+                </div>
+                <div class="flex items-center">
+                    <span class="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                    <span class="text-sm text-red-400">Offline</span>
+                </div>
+            </div>
+            <p class="text-red-400 text-center">Failed to connect to server</p>
+        `;
     }
 }
