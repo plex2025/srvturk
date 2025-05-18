@@ -1,13 +1,131 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AllDebrid Downloader</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="hidden lg:flex lg:flex-col lg:w-64 lg:bg-gray-800 lg:border-r lg:border-gray-700">
+            <div class="flex items-center justify-center h-16 px-6 bg-gray-900">
+                <div class="flex items-center">
+                    <svg class="text-blue-500 w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    <span class="ml-2 text-xl font-bold">AllDownloader</span>
+                </div>
+            </div>
+            <nav class="flex-1 px-2 py-4">
+                <a href="#" class="flex items-center px-2 py-2 text-sm font-medium rounded-md bg-gray-900 text-white">
+                    <svg class="mr-3 text-blue-500 w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Downloads
+                </a>
+            </nav>
+            <div class="p-4 border-t border-gray-700">
+                <div class="py-4">
+                    <div class="text-sm font-medium text-gray-400">Server Status</div>
+                    <div class="mt-1 flex items-center">
+                        <span class="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                        <span class="text-sm">Online</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Navbar -->
+            <header class="bg-gray-800 border-b border-gray-700">
+                <div class="flex items-center justify-between h-16 px-6">
+                    <div class="flex items-center">
+                        <button class="text-gray-400 hover:text-white lg:hidden" id="menuButton">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                        </button>
+                        <h1 class="ml-4 text-xl font-bold">AllDebrid Downloader</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-sm">
+                            <span class="text-gray-400 mr-2">API Key:</span>
+                            <span class="text-green-400" id="apiKeyDisplay"></span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main content area -->
+            <main class="flex-1 overflow-y-auto p-6">
+                <div class="max-w-4xl mx-auto space-y-8">
+                    <!-- Server Status -->
+                    <div class="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700" id="serverStatus">
+                        <!-- Server status content will be dynamically inserted here -->
+                    </div>
+
+                    <!-- Download Form -->
+                    <div class="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+                        <h2 class="text-xl font-bold mb-4">Add Downloads</h2>
+                        <div class="flex items-center mb-4">
+                            <button id="singleUrlBtn" class="px-4 py-2 rounded-l-md bg-blue-600 text-white">Single URL</button>
+                            <button id="multiUrlBtn" class="px-4 py-2 rounded-r-md bg-gray-700 text-gray-300">Multiple URLs</button>
+                        </div>
+                        <div id="urlInputContainer" class="mb-4">
+                            <div class="flex">
+                                <input type="text" id="urlInput" class="flex-grow px-4 py-2 bg-gray-700 border border-gray-600 rounded-l-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter URL to download">
+                                <button id="addUrlBtn" class="px-4 py-2 bg-blue-600 rounded-r-md hover:bg-blue-700 transition-colors">Add</button>
+                            </div>
+                        </div>
+                        <div id="urlList" class="mb-6 hidden">
+                            <!-- URLs will be listed here -->
+                        </div>
+                        <button id="startDownloadBtn" class="w-full py-2 flex items-center justify-center rounded-md bg-gray-700 text-gray-500 cursor-not-allowed" disabled>
+                            <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Start Downloads
+                        </button>
+                    </div>
+
+                    <!-- Download List -->
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-xl font-bold">Recent Downloads</h2>
+                                <span class="text-sm text-gray-400" id="downloadCount">0 files</span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="text-left text-xs text-gray-400 border-b border-gray-700">
+                                            <th class="pb-2 font-medium">Name</th>
+                                            <th class="pb-2 font-medium">Size</th>
+                                            <th class="pb-2 font-medium">Progress</th>
+                                            <th class="pb-2 font-medium">Status</th>
+                                            <th class="pb-2 font-medium">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="downloadList" class="divide-y divide-gray-700">
+                                        <!-- Downloads will be listed here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
 </html>
